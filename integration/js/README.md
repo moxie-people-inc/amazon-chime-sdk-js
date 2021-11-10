@@ -142,12 +142,25 @@ Run the test:
 ```shell
 $KITE_HOME/scripts/mac/path/r configs/<test_name>.config.json
 ```
-Steps to add test file to Sauce Labs virtual machine
-To create a fake video or audio stream you need the media file on Sauce Labs virtual machine before running your test. For that you can use a pre-run executable script to download file from a public storage to the virtual machine running your tests. 
-- Create a pre-run script by following the steps given on this link: https://docs.saucelabs.com/web-apps/automated-testing/selenium/pre-run-executables/#downloading-files-to-a-vm-prior-to-testing. 
-    On sauce labs virtual machines files are stored in the below folder locations
-    Windows = C:\Users\Administrator\Downloads
-    Mac = /Users/chef/Downloads
-    Linux = /home/chef/Downloads
-- Upload the pre-run executable to Sauce Labs storage by using Sauce Labs API methods: https://docs.saucelabs.com/dev/api/storage/
-- Add the pre-run to Sauce configs in your code like this prerun: 'storage:filename=filename.ext'. You can also use storage id of the file location. 
+## Testing against audio/video stream in Saucelabs
+Some tests might require testing against a custom audio/video stream. To test against a custom video or audio stream, you need the media file on Sauce Labs virtual machine before running your test. For that you can use a pre-run executable script to download file from a public storage to the virtual machine before running your tests. 
+> Pre-run executables are commonly used to change browser settings and VM configurations before a test starts. (Saucelab documentation)
+
+- Create a pre-run script by following the steps given in [downloading files to a vm prior to testing](https://docs.saucelabs.com/web-apps/automated-testing/selenium/pre-run-executables/#downloading-files-to-a-vm-prior-to-testing). 
+
+    On sauce labs virtual machines, files are stored in the following folder locations. You will need these folder locations to store the pre-run executable.
+
+    - Windows = `C:\Users\Administrator\Downloads`
+
+    - Mac = `/Users/chef/Downloads`
+
+    - Linux = `/home/chef/Downloads`
+
+- Upload the pre-run executable to Sauce Labs storage by using Sauce Labs API methods: [Saucelabs Storage CRUD API](https://docs.saucelabs.com/dev/api/storage/). You will need your Saucelabs account username and access key for authorization. 
+- Add the pre-run script to Sauce configs in your code like this prerun: 'storage:filename=filename.ext'. You can also use storage id of the file location. For reference,
+    ```js
+        // integration/js/utils/WebdriverSauceLabs.js
+        const getPrerunScript = (capabilities) =>{
+            return capabilities.name.includes("Background Blur Test") ? 'storage:cf5a00cc-2a0d-40bb-9f2e-f721f2eec1f4' : "";
+        }
+    ```
