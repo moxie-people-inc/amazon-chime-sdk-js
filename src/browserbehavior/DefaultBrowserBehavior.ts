@@ -274,10 +274,27 @@ export default class DefaultBrowserBehavior implements BrowserBehavior, Extended
     return 'setSinkId' in HTMLAudioElement.prototype;
   }
 
+  requiresDisablingH264Encoding(): boolean {
+  
+    let res = this.isIOSSafari() && this.version() === '15.1.0';
+    if ( res ) {
+      console.log('Safari on iOS detected. H264Encoding has been disabled.');
+    } else {
+      console.log('===== NON IOS BROWSER ===== H264Encoding Not disabled.');
+      console.log("this.version()", this.version(),"this.isIOSSafari()", this.isIOSSafari(), "isTouchDeviceSafari()",this.isTouchDeviceSafari(),  " this.isSafari()",  this.isSafari(), "this.isTouchEnabled()", this.isTouchEnabled());
+    }
+    
+    return this.isIOSSafari() && this.version() === '15.1.0';
+  }
+
   // These helpers should be kept private to encourage
   // feature detection instead of browser detection.
   private isIOSSafari(): boolean {
-    return this.browser.name === 'ios' || this.browser.name === 'ios-webview';
+    return this.browser.name === 'ios' || this.browser.name === 'ios-webview' || this.isTouchDeviceSafari();
+  }
+  
+  private isTouchDeviceSafari(): boolean {
+    return this.isSafari() && this.isTouchEnabled(); 
   }
 
   private isSafari(): boolean {
@@ -318,5 +335,13 @@ export default class DefaultBrowserBehavior implements BrowserBehavior, Extended
 
   private isUnifiedPlanSupported(): boolean {
     return RTCRtpTransceiver.prototype.hasOwnProperty('currentDirection');
+  }
+  
+  private isTouchEnabled(): boolean {
+    if ( !( "ontouchend" in document ) ) {
+      // It's not a touch device.
+      return false;
+    }
+    return true;
   }
 }
